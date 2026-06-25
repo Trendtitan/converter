@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agrinal Vouchers Print</title>
     <style>
-        /* Reset and Base Styles */
+        /* Base Setup */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,136 +13,194 @@
             background-color: #f5f5f5;
         }
 
-        /* Grid Layout for the Page */
-        .voucher-grid {
+        /* Page Container (30 Vouchers per block) */
+        .page {
+            background-color: #fff;
+            width: 210mm; /* A4 Width */
+            height: 297mm; /* A4 Height */
+            margin: 20px auto;
+            padding: 10mm;
+            box-sizing: border-box;
             display: grid;
-            /* Adjust columns based on how many fit your page width (e.g., 5 columns) */
+            /* 5 Columns x 6 Rows = 30 Vouchers */
             grid-template-columns: repeat(5, 1fr);
-            gap: 1px; /* Creates the border lines between vouchers */
-            background-color: #ccc; /* Border color */
-            max-width: 210mm; /* Standard A4 Width */
-            margin: 0 auto;
-            background-color: #000; /* Strict black lines for grid */
+            grid-template-rows: repeat(6, 1fr);
+            gap: 1px;
+            background-color: #000; /* Thin black borders between vouchers */
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         /* Individual Voucher Card */
         .voucher-card {
             background-color: #fff;
-            box-sizing: border-box;
-            padding: 10px;
-            text-align: center;
+            padding: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            height: 140px; /* Adjust height to fit your desired layout aspect ratio */
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
-        /* Logo Area */
+        /* Logo Area matching 11904.jpg */
         .logo-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
         }
-        .logo-icon {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 2px;
-            /* Replace with your actual logo asset path or SVG */
-            border: 1px dashed #666; 
-            border-radius: 50%;
+        .logo-svg {
+            width: 28px;
+            height: 28px;
+            margin-bottom: 1px;
         }
 
-        /* Code Block */
+        /* Code Block with Icon Box */
         .code-box {
             border: 1px solid #000;
-            padding: 4px 8px;
-            font-size: 14px;
+            padding: 3px 5px;
+            font-size: 13px;
             font-weight: bold;
-            width: 85%;
-            margin: 4px 0;
+            width: 90%;
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 5px;
+            justify-content: flex-start;
+            gap: 6px;
+            box-sizing: border-box;
+        }
+        /* Tiny User Icon silhouette matching the image */
+        .user-icon {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
         }
 
-        /* Details */
+        /* Text Details */
         .details {
-            font-size: 11px;
-            line-height: 1.3;
+            font-size: 10px;
+            line-height: 1.2;
+            text-align: center;
         }
         .details .duration {
-            font-weight: 500;
+            font-weight: normal;
         }
         .details .price {
-            font-weight: bold;
+            font-weight: normal;
         }
 
         /* Footer Note */
         .footer-note {
-            font-size: 8px;
-            color: #444;
-            transform: scale(0.9);
+            font-size: 7px;
+            color: #333;
+            white-space: nowrap;
         }
 
-        /* Print Settings optimization */
+        /* Print Settings Optimization */
         @media print {
             body {
                 background-color: #fff;
             }
-            .voucher-grid {
-                max-width: 100%;
-                page-break-inside: auto;
-            }
-            .voucher-card {
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
                 page-break-inside: avoid;
             }
-            /* Hide browser headers/footers if necessary */
+            /* Hides native browser print headers/footers */
             @page {
-                margin: 10mm;
+                size: A4;
+                margin: 0;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="voucher-grid" id="grid">
-        </div>
+    <div id="print-container">
+        <!-- Pages with 30 vouchers each will be dynamically generated here -->
+    </div>
 
     <script>
-        // Paste your parsed Excel data here (e.g., converted via an online XLSX to JSON tool)
+        // Sample array built from 11902.jpg
         const vouchersData = [
-            { code: "QD8682458", duration: "7 Hours Upgrade", price: "Ugx 1000" },
-            { code: "QD6748226", duration: "7 Hours Upgrade", price: "Ugx 1000" },
-            { code: "QD6365925", duration: "7 Hours Upgrade", price: "Ugx 1000" },
-            // ... Add the rest of your 300 rows here
+            { code: "QD8682458", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD6748226", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD6365925", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD2973589", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD1373967", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD3264967", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD4434958", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD8395746", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD5436793", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD5442235", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD4787547", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD7359587", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD9237332", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD3785375", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD9778826", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD8547879", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD6476542", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD6459746", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD1264249", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD6926284", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD6437563", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD8374337", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD9954365", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD6962344", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD7236289", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD0776927", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD1122334", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD5566778", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD9900112", duration: "7HoursUpgrade", price: "Ugx1000" },
+            { code: "QD4455667", duration: "7HoursUpgrade", price: "Ugx1000" },
+            // Page 2 Will start automatically here...
+            { code: "QD1234567", duration: "7HoursUpgrade", price: "Ugx1000" } 
         ];
 
-        const gridContainer = document.getElementById('grid');
+        const container = document.getElementById('print-container');
+        const vouchersPerPage = 30;
 
-        vouchersData.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'voucher-card';
-            card.innerHTML = `
-                <div class="logo-container">
-                    <div class="logo-icon"></div>
-                    <div>AGRINAL</div>
-                </div>
-                <div class="code-box">
-                    <span>👤</span> <span>${item.code}</span>
-                </div>
-                <div class="details">
-                    <div class="duration">${item.duration}</div>
-                    <div class="price">${item.price}</div>
-                </div>
-                <div class="footer-note">Keep the ticket during the service</div>
-            `;
-            gridContainer.appendChild(card);
-        });
+        // Loop through data and split into 30-item page blocks
+        for (let i = 0; i < vouchersData.length; i += vouchersPerPage) {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'page';
+
+            const pageItems = vouchersData.slice(i, i + vouchersPerPage);
+            
+            pageItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'voucher-card';
+                card.innerHTML = `
+                    <div class="logo-container">
+                        <!-- Recreated vector logo mimicking the ribbon/star style in 11904.jpg -->
+                        <svg class="logo-svg" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="17" fill="none" stroke="#000" stroke-width="1"/>
+                            <path d="M18 6 L21 14 L29 11 L23 18 L28 25 L19 21 L14 27 L15 19 L8 15 L15 13 Z" fill="none" stroke="#000" stroke-width="1.2"/>
+                            <circle cx="18" cy="15" r="1.5" fill="#000"/>
+                        </svg>
+                        <div>AGRINAL</div>
+                    </div>
+                    <div class="code-box">
+                        <!-- Inline Vector User Silhouette Icon -->
+                        <svg class="user-icon" viewBox="0 0 24 24" fill="#000">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        <span>${item.code}</span>
+                    </div>
+                    <div class="details">
+                        <div class="duration">${item.duration}</div>
+                        <div class="price">${item.price}</div>
+                    </div>
+                    <div class="footer-note">Keep the ticket during the service</div>
+                `;
+                pageDiv.appendChild(card);
+            });
+
+            container.appendChild(pageDiv);
+        }
     </script>
 </body>
 </html>
